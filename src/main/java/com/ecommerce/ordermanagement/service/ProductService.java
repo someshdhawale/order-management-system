@@ -1,8 +1,5 @@
 package com.ecommerce.ordermanagement.service;
-import com.ecommerce.ordermanagement.dto.CreateProductRequestDTO;
-import com.ecommerce.ordermanagement.dto.UpdateProductRequestDTO;
-import com.ecommerce.ordermanagement.dto.ProductResponseDTO;
-import com.ecommerce.ordermanagement.dto.ProductSummaryDTO;
+import com.ecommerce.ordermanagement.dto.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,6 +27,13 @@ public interface ProductService {
     //LOGIC
     Boolean isSkuAvailable(String sku);
     long countProductByCategory(String category);
+
+    //PAGINATION
+ PageResponse<ProductSummaryDTO> getAllProductsPaginated(int page, int size, String sortBy, String sortDir);
+ PageResponse<ProductSummaryDTO> getProductsByCategoryPaginated(String category, int page, int size);
+ PageResponse<ProductSummaryDTO> searchProductsPaginated(String keyword, int page, int size);
+ PageResponse<ProductSummaryDTO> getProductsByPriceRangePaginated(BigDecimal minPrice, BigDecimal maxPrice, int page, int size);
+ PageResponse<ProductSummaryDTO> getActiveProductsPaginated( String active, int page, int size);
 
 
 }

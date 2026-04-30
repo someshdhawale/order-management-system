@@ -1,9 +1,6 @@
 package com.ecommerce.ordermanagement.controller;
 
-import com.ecommerce.ordermanagement.dto.CreateProductRequestDTO;
-import com.ecommerce.ordermanagement.dto.ProductResponseDTO;
-import com.ecommerce.ordermanagement.dto.ProductSummaryDTO;
-import com.ecommerce.ordermanagement.dto.UpdateProductRequestDTO;
+import com.ecommerce.ordermanagement.dto.*;
 import com.ecommerce.ordermanagement.service.ProductService;
 import com.ecommerce.ordermanagement.service.ProductServiceImplementation;
 import jakarta.persistence.Entity;
@@ -122,6 +119,43 @@ public class ProductController {
         long count=productService.countProductByCategory(category);
         return ResponseEntity.ok(count);
     }
+    // ==================== PAGINATED ENDPOINTS ====================
+    @GetMapping("/paginated/getAll")
+    public  ResponseEntity<PageResponse<ProductSummaryDTO>>getAllProductsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ProdId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection){
+        log.info("REST request to get paginated products : Page {},size {}, sortBy {} sortDirection {}",page,size,sortBy,sortDirection);
+        PageResponse<ProductSummaryDTO>pageResponse=productService.getAllProductsPaginated(page,size,sortBy,sortDirection);
+        return ResponseEntity.ok(pageResponse);
+    }
+    @GetMapping("/paginated/{category}")
+    public ResponseEntity<PageResponse<ProductSummaryDTO>>getProductByCategoryPaginated( @PathVariable String category, @RequestParam(defaultValue = "0") int page, @RequestParam("10") int size){
+    log.info("REST request to get paginated products by category {} : Page {},size {}",category,page,size);
+        PageResponse<ProductSummaryDTO>pageResponse=productService.getProductsByCategoryPaginated(category,page,size);
+    return ResponseEntity.ok(pageResponse);
+    }
+    @GetMapping("/paginated/search")
+    public ResponseEntity<PageResponse<ProductSummaryDTO>>searchPaginated(@RequestParam String search, @RequestParam (defaultValue = "0") int page,@RequestParam("10") int size){
+        log.info("REST request to search paginated product by {} ",search);
+        PageResponse<ProductSummaryDTO>pageResponse=productService.searchProductsPaginated(search,page,size);
+        return ResponseEntity.ok(pageResponse);
+    }
+    @GetMapping("/paginated/price-range")
+    public ResponseEntity<PageResponse<ProductSummaryDTO>>getProductsByPriceRangePaginated(@RequestParam BigDecimal minPrice, @RequestParam BigDecimal maxPrice, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        log.info("REST request to get paginated products by price range {} - {} : Page {},size {}",minPrice,maxPrice,page,size);
+        PageResponse<ProductSummaryDTO>pageResponse=productService.getProductsByPriceRangePaginated(minPrice,maxPrice,page,size);
+        return ResponseEntity.ok(pageResponse);
+    }
+    @GetMapping("/paginated/active")
+    public ResponseEntity<PageResponse<ProductSummaryDTO>>getActiveProductsPaginated(@RequestParam(required = false) String active, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        log.info("REST request to get paginated products by active status {} : Page {},size {}",active,page,size);
+        PageResponse<ProductSummaryDTO>pageResponse=productService.getActiveProductsPaginated(active,page,size);
+        return ResponseEntity.ok(pageResponse);
+    }
+
+
 
 
 

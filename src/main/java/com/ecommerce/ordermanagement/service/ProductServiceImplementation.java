@@ -1,17 +1,18 @@
 package com.ecommerce.ordermanagement.service;
 
-import com.ecommerce.ordermanagement.dto.CreateProductRequestDTO;
-import com.ecommerce.ordermanagement.dto.ProductResponseDTO;
-import com.ecommerce.ordermanagement.dto.ProductSummaryDTO;
-import com.ecommerce.ordermanagement.dto.UpdateProductRequestDTO;
+import com.ecommerce.ordermanagement.dto.*;
 import com.ecommerce.ordermanagement.exception.DuplicateResourceException;
 import com.ecommerce.ordermanagement.exception.InvalidRequestException;
 import com.ecommerce.ordermanagement.exception.ResourceNotFoundException;
 import com.ecommerce.ordermanagement.model.Product;
 import com.ecommerce.ordermanagement.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -219,6 +220,63 @@ public class ProductServiceImplementation implements ProductService {
         return productRepository.findByCategory(category).size();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProductSummaryDTO> getAllProductsPaginated(int page, int size, String sortBy, String sortDir) {
+        log.info("Fetching all products : Page: {}, Size : {} sortBy : {} sortDir : {}  " ,page,size,sortBy,sortDir);
+
+       Sort sort= sortDir.equalsIgnoreCase("asc")
+               ? Sort.by(sortBy).ascending()
+               : Sort.by(sortBy).descending();
+        Pageable pageable= PageRequest.of(page,size,sort);
+        Page<Product> products=productRepository.findAll(pageable);
+
+        Page<ProductSummaryDTO>pagedto=products.map(this::convertToSummaryDTO);
+        return createPageResponse(pagedto);
+
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProductSummaryDTO> getProductsByCategoryPaginated(String category, int page, int size) {
+        log.info("Fetching product  with category {} , Page {} ,Size {}",category,page,size);
+        Pageable pageable= PageRequest.of(page,size);
+        Page<Product> products=productRepository.findByCategory(category,pageable);
+        Page<ProductSummaryDTO> pagedto=products.map(this::convertToSummaryDTO);
+        return createPageResponse(pagedto);
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProductSummaryDTO> searchProductsPaginated(String keyword, int page, int size) {
+        log.info("Fetching product  with keyword {} , Page {} ,Size {}",keyword,page,size);
+        Pageable pageable= PageRequest.of(page,size);
+        Page<Product> products=productRepository.findByNameContainingIgnoreCase(keyword,pageable);
+        Page<ProductSummaryDTO> pagedto=products.map(this::convertToSummaryDTO);
+        return createPageResponse(pagedto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProductSummaryDTO> getProductsByPriceRangePaginated(BigDecimal minPrice, BigDecimal maxPrice, int page, int size) {
+        log.info("Fetching product  with price range {} - {} , Page {} ,Size {}",minPrice,maxPrice,page,size);
+        Pageable pageable= PageRequest.of(page,size);
+        Page<Product> products=productRepository.findByPriceBetween(minPrice,maxPrice,pageable);
+        Page<ProductSummaryDTO> pagedto=products.map(this::convertToSummaryDTO);
+        return createPageResponse(pagedto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ProductSummaryDTO> getActiveProductsPaginated( String active, int page, int size) {
+        log.info("Fetching active products , Page {} ,Size {}",page,size);
+        Pageable pageable= PageRequest.of(page,size);
+        Page<Product> products=productRepository.findByActiveTrue(pageable);
+        Page<ProductSummaryDTO> pagedto=products.map(this::convertToSummaryDTO);
+        return createPageResponse(pagedto);
+    }
+
+
     //Helper Method to convert Product to ProductResponseDTO
     private ProductResponseDTO convertToProductResponse(Product product){
         return ProductResponseDTO.builder()
@@ -243,6 +301,19 @@ public class ProductServiceImplementation implements ProductService {
                 .active(product.getActive())
                 .build();
     }
+    private <T>PageResponse<T> createPageResponse(Page<T> page){
+        return PageResponse.<T>builder()
+                .content(page.getContent())
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .last(page.isLast())
+                .first(page.isFirst())
+                .empty(page.isEmpty())
+                .build();
+    }
+
 
 
 

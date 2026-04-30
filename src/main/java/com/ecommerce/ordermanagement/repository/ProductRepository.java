@@ -36,7 +36,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByCategory(String category, Pageable pageable);
 
-    Page<Product> findAll(Pageable pageable);
+    //custom paginated methods:
     Page<Product> findByActiveTrue(Pageable pageable);
     Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
+    Page<Product> findByCategoryAndActiveTrue(String category, Pageable pageable);
+    Page<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
+
 }
