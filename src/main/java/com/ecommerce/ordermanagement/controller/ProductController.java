@@ -150,7 +150,7 @@ public class ProductController {
     }
     @GetMapping("/paginated/active")
     public ResponseEntity<PageResponse<ProductSummaryDTO>>getActiveProductsPaginated(@RequestParam(required = false) String active, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
-        log.info("REST request to get paginated products by active status {} : Page {},size {}",active,page,size);
+        log.info("REST request for paginated products by active status {} : Page {},size {}",active,page,size);
         PageResponse<ProductSummaryDTO>pageResponse=productService.getActiveProductsPaginated(active,page,size);
         return ResponseEntity.ok(pageResponse);
     }
