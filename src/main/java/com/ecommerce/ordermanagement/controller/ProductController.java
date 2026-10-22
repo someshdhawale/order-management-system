@@ -124,20 +124,20 @@ public class ProductController {
     public  ResponseEntity<PageResponse<ProductSummaryDTO>>getAllProductsPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ProdId") String sortBy,
+            @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection){
         log.info("REST request to get paginated products : Page {},size {}, sortBy {} sortDirection {}",page,size,sortBy,sortDirection);
         PageResponse<ProductSummaryDTO>pageResponse=productService.getAllProductsPaginated(page,size,sortBy,sortDirection);
         return ResponseEntity.ok(pageResponse);
     }
     @GetMapping("/paginated/{category}")
-    public ResponseEntity<PageResponse<ProductSummaryDTO>>getProductByCategoryPaginated( @PathVariable String category, @RequestParam(defaultValue = "0") int page, @RequestParam("10") int size){
+    public ResponseEntity<PageResponse<ProductSummaryDTO>>getProductByCategoryPaginated( @PathVariable String category, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
     log.info("REST request to get paginated products by category {} : Page {},size {}",category,page,size);
         PageResponse<ProductSummaryDTO>pageResponse=productService.getProductsByCategoryPaginated(category,page,size);
     return ResponseEntity.ok(pageResponse);
     }
     @GetMapping("/paginated/search")
-    public ResponseEntity<PageResponse<ProductSummaryDTO>>searchPaginated(@RequestParam String search, @RequestParam (defaultValue = "0") int page,@RequestParam("10") int size){
+    public ResponseEntity<PageResponse<ProductSummaryDTO>>searchPaginated(@RequestParam String search, @RequestParam (defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size){
         log.info("REST request to search paginated product by {} ",search);
         PageResponse<ProductSummaryDTO>pageResponse=productService.searchProductsPaginated(search,page,size);
         return ResponseEntity.ok(pageResponse);

@@ -30,6 +30,7 @@ public class Product {
             strategy = GenerationType.SEQUENCE,
             generator = "product_sequence"
     )
+    @Column(name = "prod_id", nullable = false)
     private Long ProdId;
     @Column(name = "name", nullable = false,length = 255)
     private String name;
